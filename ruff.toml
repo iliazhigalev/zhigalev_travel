@@ -1,0 +1,13 @@
+# ruff.toml
+line-length = 100
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "I", "B", "C4", "UP"]
+ignore = ["E501"]
+
+[format]
+quote-style = "double"
+
+[per-file-ignores]
+"__init__.py" = ["F401"]
