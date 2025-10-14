@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from .room import Room
@@ -15,12 +16,15 @@ class Booking(models.Model):
         verbose_name = "Бронирование"
         verbose_name_plural = "Бронирования"
         ordering = ["-created_at"]
+        indexes = [
+            # Критически важный индекс для проверки доступности номеров
+            models.Index(fields=["room"]),
+        ]
 
     def __str__(self):
         return f"Бронь комнаты {self.room.number} c {self.check_in} по {self.check_out}"
 
-    def save(self, *args, **kwargs):
-        # Простейшая бизнес-логика: проверка дат
+    def clean(self):
+        # Валидация дат
         if self.check_in >= self.check_out:
-            raise ValueError("Дата выезда должна быть позже даты заезда.")
-        super().save(*args, **kwargs)
+            raise ValidationError("Дата выезда должна быть позже даты заезда.")

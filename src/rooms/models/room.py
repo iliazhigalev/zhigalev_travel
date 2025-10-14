@@ -16,6 +16,7 @@ class Room(models.Model):
         verbose_name = "Номер"
         verbose_name_plural = "Номера"
         ordering = ["number"]
+        indexes = [models.Index(fields=["number"])]
 
     def __str__(self):
         return f"Комната номер № {self.number}"
