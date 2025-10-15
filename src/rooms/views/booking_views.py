@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..serializers import BookingSerializer
+from ..serializers import BookingCreateSerializer, BookingSerializer
 from ..services import create_booking, delete_booking, list_bookings
 
 
@@ -26,7 +26,7 @@ class BookingListCreateView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
-        serializer = BookingSerializer(data=request.data)
+        serializer = BookingCreateSerializer(data=request.data)
         if serializer.is_valid():
             try:
                 booking = create_booking(serializer.validated_data)

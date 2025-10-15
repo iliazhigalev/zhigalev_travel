@@ -15,10 +15,14 @@ def create_room(data):
 
 
 def list_rooms(sort_by="created_at", order="asc"):
-    if sort_by not in ["price", "created_at"]:
+    if sort_by == "price":
+        sort_by = "price_per_night"
+    elif sort_by not in ["price_per_night", "created_at"]:
         sort_by = "created_at"
+
     if order == "desc":
         sort_by = f"-{sort_by}"
+
     return Room.objects.all().order_by(sort_by)
 
 
@@ -32,11 +36,23 @@ def delete_room(room_id):
 
 
 def create_booking(data):
-    try:
-        room = data["room"]
-    except ObjectDoesNotExist:
-        raise ValueError("Room not found")
-    return Booking.objects.create(room=room, check_in=data["check_in"], check_out=data["check_out"])
+    room_id = data.get("room_id") or data.get("room")
+    date_start = data["date_start"]
+    date_end = data["date_end"]
+
+    room = Room.objects.filter(id=room_id).first()
+    if not room:
+        raise ValueError("Номер не найден")
+
+    if date_end <= date_start:
+        raise ValueError("Дата выезда должна быть позже даты заезда")
+
+    booking = Booking.objects.create(
+        room=room,
+        check_in=date_start,
+        check_out=date_end,
+    )
+    return booking
 
 
 def list_bookings(room_id: int):
