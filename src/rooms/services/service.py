@@ -1,4 +1,3 @@
-# rooms/services.py
 from django.core.exceptions import ObjectDoesNotExist
 
 from ..models import Booking, Room

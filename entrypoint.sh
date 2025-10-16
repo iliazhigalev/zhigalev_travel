@@ -3,7 +3,6 @@ set -e
 
 cd /app/src
 
-# Проверяем, есть ли миграции
 if ! python manage.py showmigrations auth | grep -q '\[X\]'; then
   echo "First run detected — applying migrations..."
   python manage.py migrate --noinput
@@ -19,5 +18,8 @@ else
   echo "Migrations already applied, skipping setup."
 fi
 
-echo "Starting Django server..."
-exec python manage.py runserver 0.0.0.0:8000
+python manage.py collectstatic --noinput
+
+exec gunicorn src.wsgi:application \
+    --bind 0.0.0.0:8000 \
+    --workers 4 \

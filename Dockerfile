@@ -1,18 +1,29 @@
-# Используем официальный образ Python
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Копируем зависимости
-COPY requirements.txt .
+RUN apt-get update && apt-get install -y \
+    curl \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-# Копируем весь проект
+ENV PATH="/root/.local/bin:$PATH"
+
+COPY pyproject.toml poetry.lock ./
+
+COPY entrypoint.sh /app/entrypoint.sh
+
+RUN poetry config virtualenvs.create false
+
+RUN poetry install --only main --no-interaction --no-ansi
+
 COPY . .
 
-# Даём права на выполнение entrypoint.sh
+EXPOSE 8000
+
 RUN chmod +x /app/entrypoint.sh
 
-# Указываем скрипт запуска
-ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["/app/entrypoint.sh"]

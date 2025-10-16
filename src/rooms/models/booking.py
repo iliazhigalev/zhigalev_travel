@@ -17,7 +17,6 @@ class Booking(models.Model):
         verbose_name_plural = "Бронирования"
         ordering = ["-created_at"]
         indexes = [
-            # Критически важный индекс для проверки доступности номеров
             models.Index(fields=["room"]),
         ]
 
